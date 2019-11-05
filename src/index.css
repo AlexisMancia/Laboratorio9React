@@ -49,6 +49,9 @@ ol, ul {
   margin-left: 20px;
 }
 
+.selectbox{
+  margin-bottom: 1em;
+}
 
 table {
   width: 750px;

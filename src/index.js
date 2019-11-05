@@ -5,11 +5,11 @@ import './index.css';
 
 
 class Student {
-  constructor(carnet, name, lastname,tarde/*,horario,tarde*/) {
+  constructor(carnet, name, lastname,tarde,horario/*,horario,tarde*/) {
       this._carnet = carnet;
       this._name = name;
       this._lastname = lastname;
-      //this._horario = horario;
+      this._horario = horario;
       this._tarde = tarde;
   }
 
@@ -17,12 +17,14 @@ class Student {
   get name() { return this._name }
   get lastname() { return this._lastname }
   get tarde() {return this._tarde}
+  get horario() {return this._horario}
 
   // Hacen falta las validaciones antes de la asignación
   set carnet(carnet) { this._carnet = carnet }
   set name(name) { this._name = name }
   set lastname(lastname) { this._lastname = lastname }
   set tarde(tarde) {this._tarde = tarde} 
+  set horario(horario) {this._horario = horario}
 }
 
 class StudentsList extends React.Component {
@@ -39,7 +41,7 @@ class StudentsList extends React.Component {
   }
 
   renderBody(students) {
-      return students.map(({ carnet, name, lastname ,tarde}) => {
+      return students.map(({ carnet, name, lastname ,tarde,horario}) => {
           return (
               <tr 
               className="table-dark"
@@ -47,6 +49,7 @@ class StudentsList extends React.Component {
                   <td>{carnet}</td>
                   <td>{name}</td>
                   <td>{lastname}</td>
+                  <td>{horario}</td>
                   <td>{tarde}</td>
                   <td>
                       <button className="btn btn-danger" onClick={() => {this.props.onDelete(carnet)}}>Delete</button>
@@ -80,7 +83,7 @@ class StudentForm extends React.Component {
 
   constructor(props) {
       super(props);
-      this.state = { carnet: '', name: '', lastname: '',tarde: '' };
+      this.state = { carnet: '', name: '', lastname: '',tarde: '' ,horario: ''};
 
       this.handleInputChange = this.handleInputChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -95,6 +98,8 @@ class StudentForm extends React.Component {
      
       var carnet_regex = new RegExp('^[0-9]{8}$');
       //console.log(carnet_regex);
+      //console.log(this.state.horario);
+      
       let parseLateSwitch= (value)=>{
           if(value){
           return "Tardisimo"
@@ -105,7 +110,7 @@ class StudentForm extends React.Component {
          
       if(this.state.carnet && this.state.name && this.state.lastname){
         let tarde = parseLateSwitch(this.state.tarde)
-        let student = new Student(this.state.carnet, this.state.name, this.state.lastname,tarde);
+        let student = new Student(this.state.carnet, this.state.name, this.state.lastname,tarde,this.state.horario);
         this.props.onSave(student);
 
       }else{
@@ -126,11 +131,11 @@ class StudentForm extends React.Component {
 
   // Label + input
   // TODO: Necesita se modificado para funcionar con todos los tipos de entrada
-  renderInput(name,placeholder, type = "text") {
+  renderInput(name,placeholder,labelName, type = "text") {
       return (
           /* Se un fragmento React, para establecer que este código se hijo directo en el resultado */
           <fieldset>
-              <label htmlFor={name}>{name}</label>
+              <label htmlFor={name}>{labelName}</label>
               <input
                   className="form-control"
                   type={type}
@@ -145,15 +150,21 @@ class StudentForm extends React.Component {
   renderInputSelect(name){
     return(
       <fieldset>
-        <label className="schedule">Seleccione el horario:</label>
-                <select>
-                    <option>Lunes de 9:00 a 11.00</option>
-                    <option>Martes de 13:30 a 15:30</option>
-                    <option>Miércoles de 9:00 a 11.00</option>
-                    <option>Jueves de 13:30 a 15:30</option>
-                    <option>Viernes de 9:00 a 11.00</option>
-                    <option>Viernes de 15:30 a 17:30</option>
-                </select>
+        <label htmlFor={name} className="schedule">Seleccione el horario:</label>
+          <select
+          className="form-control selectbox"
+          name={name} id={name}
+          value={this.state[name]}
+          onChange={this.handleInputChange}
+          >
+            <option value="Lunes de 9:00 a 11.00">Lunes de 9:00 a 11.00</option>
+            <option value="Martes de 13:30 a 15:30">Martes de 13:30 a 15:30</option>
+            <option value="Miércoles de 9:00 a 11.00">Miércoles de 9:00 a 11.00</option>
+            <option value="Jueves de 13:30 a 15:30">Jueves de 13:30 a 15:30</option>
+            <option value="Viernes de 15:30 a 17:30">Viernes de 15:30 a 17:30</option>
+          </select>
+                
+            
       </fieldset>
     );
   }
@@ -163,10 +174,11 @@ class StudentForm extends React.Component {
       return (
           <form id="contact" action="" onSubmit={this.handleSubmit}>
               <h3>Student Form</h3>
-              {this.renderInput("carnet","^[0-9]{8}$")}
-              {this.renderInput("name","Nombre")}
-              {this.renderInput("lastname","Apellido")}
-              {this.renderInput("tarde","checkbox",this.state.type="checkbox")}
+              {this.renderInput("carnet","^[0-9]{8}$","Carnet:")}
+              {this.renderInput("name","Nombre","Nombre:")}
+              {this.renderInput("lastname","Apellido","Apellido")}
+              {this.renderInput("tarde","checkbox","Llego tarde?",this.state.type="checkbox")}
+              {this.renderInputSelect("horario")}
               
               <fieldset>
                   <button className="btn btn-danger" name="submit" type="submit" id="contact-submit" data-submit="...Sending">Submit</button>
