@@ -5,22 +5,24 @@ import './index.css';
 
 
 class Student {
-  constructor(carnet, name, lastname/*,horario,tarde*/) {
+  constructor(carnet, name, lastname,tarde/*,horario,tarde*/) {
       this._carnet = carnet;
       this._name = name;
       this._lastname = lastname;
       //this._horario = horario;
-      //this._tarde = tarde;
+      this._tarde = tarde;
   }
 
   get carnet() { return this._carnet }
   get name() { return this._name }
   get lastname() { return this._lastname }
+  get tarde() {return this._tarde}
 
   // Hacen falta las validaciones antes de la asignación
   set carnet(carnet) { this._carnet = carnet }
   set name(name) { this._name = name }
   set lastname(lastname) { this._lastname = lastname }
+  set tarde(tarde) {this._tarde = tarde} 
 }
 
 class StudentsList extends React.Component {
@@ -37,7 +39,7 @@ class StudentsList extends React.Component {
   }
 
   renderBody(students) {
-      return students.map(({ carnet, name, lastname }) => {
+      return students.map(({ carnet, name, lastname ,tarde}) => {
           return (
               <tr 
               className="table-dark"
@@ -45,6 +47,7 @@ class StudentsList extends React.Component {
                   <td>{carnet}</td>
                   <td>{name}</td>
                   <td>{lastname}</td>
+                  <td>{tarde}</td>
                   <td>
                       <button className="btn btn-danger" onClick={() => {this.props.onDelete(carnet)}}>Delete</button>
                   </td>
@@ -77,7 +80,7 @@ class StudentForm extends React.Component {
 
   constructor(props) {
       super(props);
-      this.state = { carnet: '', name: '', lastname: '' };
+      this.state = { carnet: '', name: '', lastname: '',tarde: '' };
 
       this.handleInputChange = this.handleInputChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -88,15 +91,23 @@ class StudentForm extends React.Component {
   handleSubmit(event) {
       event.preventDefault();
       // Se necesitan validaciones de entrada
-      console.log(this.state.carnet);
+      //console.log(this.state.carnet);
      
       var carnet_regex = new RegExp('^[0-9]{8}$');
       //console.log(carnet_regex);
-      
+      let parseLateSwitch= (value)=>{
+          if(value){
+          return "Tardisimo"
+          }
+          return "A tiempo"
+          }
+         //console.log(this.state.tarde);
+         
       if(this.state.carnet && this.state.name && this.state.lastname){
-        let student = new Student(this.state.carnet, this.state.name, this.state.lastname);
+        let tarde = parseLateSwitch(this.state.tarde)
+        let student = new Student(this.state.carnet, this.state.name, this.state.lastname,tarde);
         this.props.onSave(student);
-       //if de la checked box 
+
       }else{
         alert("Llene todos los campos")
       }
@@ -155,8 +166,8 @@ class StudentForm extends React.Component {
               {this.renderInput("carnet","^[0-9]{8}$")}
               {this.renderInput("name","Nombre")}
               {this.renderInput("lastname","Apellido")}
-              {this.renderInput("Llego Tarde","checkbox",this.state.type="checkbox")}
-              {this.renderInputSelect("asd")}
+              {this.renderInput("tarde","checkbox",this.state.type="checkbox")}
+              
               <fieldset>
                   <button className="btn btn-danger" name="submit" type="submit" id="contact-submit" data-submit="...Sending">Submit</button>
               </fieldset>
